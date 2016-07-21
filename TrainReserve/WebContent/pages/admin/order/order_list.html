@@ -1,0 +1,151 @@
+<% 
+	var headContent = {
+	include("/pages/template/head.html"){}
+%>
+
+<script type="text/javascript">
+var oper;
+jQuery(function($) {
+	// 页面方法
+	oper = {
+		width : 450,
+		height : 500,
+		form : document.form1,
+		list : function() {
+			var url = 'system/user/list';
+			this.form.action = url;
+			this.form.submit();
+		},
+		view : function(id) {
+			var url = 'system/user/view/'+id;
+			var title = '查看用户';
+			Iframe(url, this.width, this.height, title, false, false, false, EmptyFunc);
+		},
+		
+		edit : function(id) {
+			var url = 'system/user/edit/'+id;
+			var title = '修改用户';
+			Iframe(url, this.width, this.height, title);
+		},
+		del : function(id) {
+			var url = 'system/user/delete/'+id;
+			var title = '确认要删除该用户信息？';
+			Confirm(title, function() {
+				form1.action = url;
+				form1.submit();
+			});
+		}
+		,auth : function(id) {
+			var url = 'system/user/auth/'+id;
+			var title = '授权角色';
+			Iframe(url, 320, 400, title);
+		}
+	};
+	//显示Menu索引
+	showMenu('page_system');
+	showMenu('page_user');
+});
+
+//分页
+var paginator = function(page) {
+	oper.list();
+};
+
+</script>
+
+<%
+};
+
+var bodyContent = {
+%>
+	<form name="form1" action="" method="post"  class="form-inline" role="form">
+		<!-- 菜单 -->
+		<% include("/pages/template/menu.html"){} %>
+
+		<div class="tableSearch">
+			<%  //查询列表 %>
+			<div class="form-group">
+					<input class="form-control" type="text" name="attr.username" value="${attr.username!''}" 
+						placeholder="请输入登陆名" required='required' />
+			</div>
+				<div class="form-group">
+					<input class="form-control" type="text" name="attr.realname" value="${attr.realname!''}" 
+						placeholder="请输入真实姓名"  />
+			</div>
+				<div class="form-group">
+				<select name="attr.payStatus" class="form-control" >
+					<option value="-1">--支付状态--</option>
+					<option value="1" >已支付</option>
+					<option value="2" >未支付</option>
+					<option value="3" >支付失败</option>
+					
+				</select>
+				
+				
+			</div>
+			
+	 
+			
+			<button type="button" class="btn btn-default" onclick="oper.list();" name="search">
+			 		<span class="glyphicon glyphicon-search"></span> 查 询
+			</button>
+			<button type="button" class="btn btn-default" onclick="resetForm();">
+			 		<span class="glyphicon glyphicon-refresh"></span> 重 置
+			</button>
+			<button type="button" class="btn btn-default" onclick="oper.add();">
+			 		<span class="glyphicon glyphicon-plus"></span> 新 增
+			</button>
+		</div>
+		
+		<!-- 数据列表 -->
+		<table class="table table-striped table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>序号</th>
+					<%  // 列表头部 %>
+					<th name="departid" class="sorting">订单号</th> 
+					<th name="username" class="sorting">用户姓名</th> 
+					<th name="realname" class="sorting">驾考类型</th> 
+					<th name="usertype" class="sorting">驾考场地</th> 
+					<th name="email" class="sorting">开始时间</th> 
+					<th name="tel" class="sorting">训练时长</th> 
+					<th name="create_time" class="sorting">训练费用</th>
+					<th name="create_time" class="sorting">支付状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+			<% for(item in page.list){ %>
+				<tr>
+					<td>${itemLP.index }</td>
+					<%  // 列表内容 %>
+					<td>${item.id}</td> 
+					<td>${item.call_name}</td> 
+					<td>${item.license_level}</td> 
+					<td>
+					${item.training_field}
+					</td>
+					<td>${item.training_start_time}</td> 
+					<td>${item.duration}</td> 
+					<td>${item.order_amount}</td>
+					<% if(isEmpty(item.pay_status)) { %>
+					<td>未支付</td>
+					<% } else {%>
+					<td>${item.pay_status}</td>
+					<% } %>
+					
+					<td>
+					<a href="javascript:void(0);" class="btn btn-sm btn-success" onclick="oper.view(${item.id});">查看</a> 
+					
+					</td>
+				</tr>
+			<% } %>
+			</tbody>
+		</table>
+		<%include("/pages/includes/paginator.html"){} %>
+	</form>
+<%}; %>
+
+
+<% layout("/pages/template/_layout.html",{head:headContent,body:bodyContent}){ %>
+<%} %>
